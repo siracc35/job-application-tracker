@@ -1,5 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
 from sqlalchemy.orm import Session
+from typing import Optional
 
 from app.database import get_db
 from app.models.application import Application
@@ -18,8 +19,22 @@ def create_application(payload: ApplicationCreate, db: Session = Depends(get_db)
 
 
 @router.get("", response_model=list[ApplicationOut])
-def list_applications(db: Session = Depends(get_db)):
-    return db.query(Application).all()
+def list_applications(
+    db: Session = Depends(get_db),
+    company: Optional[str] = None,
+    position: Optional[str] = None,
+    skip: int = Query(0, ge=0),
+    limit: int = Query(10, ge =1 , le =100),):
+    
+    qyery = db.query(Application)
+    
+    if company:
+        qyery = qyery.filter(Application.company.ilike(f"%{company}%"))
+        
+    if position:
+        qyery = qyery.filter(Application.position.ilike(f"%{position}%"))
+    
+    return qyery.offset(skip).limit(limit).all()    
 
 @router.get("/{application_id}", response_model=ApplicationOut)
 def get_application(application_id: int, db: Session = Depends(get_db)):

@@ -1,0 +1,9 @@
+export const STATUSES = [
+  "APPLIED",
+  "HR_INTERVIEW",
+  "TECH_INTERVIEW",
+  "CASE_STUDY",
+  "OFFER",
+  "REJECTED",
+  "WITHDRAWN",
+];
